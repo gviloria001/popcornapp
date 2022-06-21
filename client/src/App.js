@@ -1,113 +1,21 @@
-import './App.css';
-import React, { useState } from 'react';
-import Axios from "axios";
+
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Home from './pages/Home';
+import SignInPage from './pages/SignIn';
+import UsersPage from './pages/UsersPage'
 
 
 
 function App() {
-
-  // CRUD USERS //////////////////////////////////////////////////
-  const [userFirstName, setUserFirstName] = useState("");
-  const [userLastName, setUserLastName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [userPhoneNumber, setUserPhoneNumber] = useState("");
-  const [userList, setUserList] = useState([]);
-
-  const addUser = () => {
-    Axios.post("http://localhost:3001/addUser", {
-      userFirstName: userFirstName,
-      userLastName: userLastName,
-      userEmail: userEmail,
-      userPhoneNumber: userPhoneNumber,
-    }).then(() => {
-      setUserList([
-        ...userList,
-        {
-          userFirstName: userFirstName,
-          userLastName: userLastName,
-          userEmail: userEmail,
-          userPhoneNumber: userPhoneNumber,
-        },
-      ])
-    })
-  }
-
-
-  const deleteUser = (userID) => {
-    Axios.delete(`http://localhost:3001/delete/${userID}`).then((response) => {
-      setUserList(
-        userList.filter((val) => {
-          return val.userID != userID;
-        })
-      );
-    });
-  };
-
-
-  const getUsers = () => {
-    Axios.get("http://localhost:3001/users").then((res) => {
-      setUserList(res.data);
-    })
-  }
-
-  ///////////////////////////////////////////////////////////////
-
-
-
-
-
-
   return (
     <div className="App">
-      <div className="information">
-        <label>First Name:</label>
-        <input
-          type="text"
-          onChange={(event) => {
-            setUserFirstName(event.target.value);
-          }}
-        />
-        <label>Last Name:</label>
-        <input
-          type="text"
-          onChange={(event) => {
-            setUserLastName(event.target.value);
-          }}
-        />
-        <label>Email:</label>
-        <input
-          type="text"
-          onChange={(event) => {
-            setUserEmail(event.target.value);
-          }}
-        />
-        <label>Phone Number:</label>
-        <input
-          type="text"
-          onChange={(event) => {
-            setUserPhoneNumber(event.target.value);
-          }}
-        />
-        <button onClick={addUser}>Add User</button>
-      </div>
-
-      <div>
-        <button onClick={getUsers}>Show Users</button>
-      </div>
-
-      <div>
-        {userList.map((val) => {
-          return (
-            <div key={val.userID}>
-              {val.userFirstName}
-              {val.userLastName}
-              {val.userEmail}
-              {val.userPhoneNumber}
-              <button onClick={() => { deleteUser(val.userID) }}> Delete User </button>
-            </div>
-          );
-        })}
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/SignInPage" element={<SignInPage />} />
+          <Route path="/UsersPage" element={<UsersPage />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }

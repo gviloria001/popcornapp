@@ -33,6 +33,19 @@ app.post("/addUser", (req, res) => {
     );
 });
 
+app.get('/accountinfo', (req, res) => {
+    const userAccountName = req.body.userAccountName;
+    const userAccountPassword = req.body.userAccountPassword;
+    db.query("SELECT userAccountName, userAccountPassword FROM user  WHERE userAccountName = ? && userAccountPassword = ?", [userAccountName, userAccountPassword], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.send(result);
+        }
+    });
+})
+
 app.get('/users', (req, res) => {
     db.query("SELECT * FROM user", (err, result) => {
         if (err) {
