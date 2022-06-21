@@ -1,17 +1,31 @@
-import { useState } from "react";
-import { Link } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom"
 import Axios from "axios";
 export default function SignInPage() {
     const [tempAccountName, setTempAccountName] = useState("");
     const [tempAccountPassword, setTempAccountPassword] = useState("");
+    const [loggedIn, setLoggedIn] = useState(false);
+    let navigate = useNavigate();
 
-    const getCredentials = () => {
+    useEffect(() => {
+        if (loggedIn) {
+            return navigate("/");
+        }
+    }, [loggedIn]);
 
+
+    const getCredentials = (res) => {
+        if (res.data[0].userAccountName == tempAccountName && res.data[0].userAccountPassword == tempAccountPassword) {
+            setLoggedIn(true);
+        }
     }
 
     const AuthenticateLogin = () => {
-        Axios.get("http://localhost:3001/accountinfo").then((res) => {
-
+        Axios.post("http://localhost:3001/accountinfo", {
+            tempAccountName: tempAccountName,
+            tempAccountPassword: tempAccountPassword,
+        }).then((res) => {
+            getCredentials(res);
         })
     }
 

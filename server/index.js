@@ -19,10 +19,12 @@ app.post("/addUser", (req, res) => {
     const userLastName = req.body.userLastName;
     const userEmail = req.body.userEmail;
     const userPhoneNumber = req.body.userPhoneNumber;
+    const userAccountName = req.body.userAccountName;
+    const userAccountPassword = req.body.userAccountPassword;
 
     db.query(
-        "INSERT INTO user (userFirstName, userLastName, userEmail, userPhoneNumber) VALUES (?,?,?,?)",
-        [userFirstName, userLastName, userEmail, userPhoneNumber],
+        "INSERT INTO user (userFirstName, userLastName, userEmail, userPhoneNumber, userAccountName, userAccountPassword ) VALUES (?,?,?,?,?,?)",
+        [userFirstName, userLastName, userEmail, userPhoneNumber, userAccountName, userAccountPassword],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -33,14 +35,15 @@ app.post("/addUser", (req, res) => {
     );
 });
 
-app.get('/accountinfo', (req, res) => {
-    const userAccountName = req.body.userAccountName;
-    const userAccountPassword = req.body.userAccountPassword;
+app.post('/accountinfo', (req, res) => {
+    const userAccountName = req.body.tempAccountName;
+    const userAccountPassword = req.body.tempAccountPassword;
     db.query("SELECT userAccountName, userAccountPassword FROM user  WHERE userAccountName = ? && userAccountPassword = ?", [userAccountName, userAccountPassword], (err, result) => {
         if (err) {
             console.log(err);
         }
         else {
+            console.log(result);
             res.send(result);
         }
     });

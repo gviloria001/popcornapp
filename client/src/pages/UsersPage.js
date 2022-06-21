@@ -7,6 +7,8 @@ export default function UsersPage() {
     const [userLastName, setUserLastName] = useState("");
     const [userEmail, setUserEmail] = useState("");
     const [userPhoneNumber, setUserPhoneNumber] = useState("");
+    const [userAccountName, setUserAccountName] = useState("");
+    const [userAccountPassword, setUserAccountpassword] = useState("");
     const [userList, setUserList] = useState([]);
 
     const addUser = () => {
@@ -15,6 +17,8 @@ export default function UsersPage() {
             userLastName: userLastName,
             userEmail: userEmail,
             userPhoneNumber: userPhoneNumber,
+            userAccountName: userAccountName,
+            userAccountPassword: userAccountPassword,
         }).then(() => {
             setUserList([
                 ...userList,
@@ -82,6 +86,20 @@ export default function UsersPage() {
                     type="text"
                     onChange={(event) => {
                         setUserPhoneNumber(event.target.value);
+                    }}
+                />
+                <label>Account Name:</label>
+                <input
+                    type="text"
+                    onChange={(event) => {
+                        setUserAccountName(event.target.value);
+                    }}
+                />
+                <label>Account Password:</label>
+                <input
+                    type="text"
+                    onChange={(event) => {
+                        setUserAccountpassword(event.target.value);
                     }}
                 />
                 <button onClick={addUser}>Add User</button>
