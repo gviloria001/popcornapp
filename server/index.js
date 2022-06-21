@@ -8,13 +8,34 @@ app.use(express.json())
 const db = mysql.createConnection({
     user: 'root',
     host: 'localhost',
-    password: '123',
+    password: 'password',
     database: 'pcdb',
+});
+
+
+
+app.post("/addUser", (req, res) => {
+    const userFirstName = req.body.userFirstName;
+    const userLastName = req.body.userLastName;
+    const userEmail = req.body.userEmail;
+    const userPhoneNumber = req.body.userPhoneNumber;
+
+    db.query(
+        "INSERT INTO user (userFirstName, userLastName, userEmail, userPhoneNumber) VALUES (?,?,?,?)",
+        [userFirstName, userLastName, userEmail, userPhoneNumber],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send("Values Inserted");
+            }
+        }
+    );
 });
 
 app.get('/users', (req, res) => {
     db.query("SELECT * FROM user", (err, result) => {
-        if (err){
+        if (err) {
             console.log(err);
         }
         else {
@@ -23,6 +44,17 @@ app.get('/users', (req, res) => {
     });
 })
 
-app.listen(3001, ()=> {
+app.delete("/delete/:userID", (req, res) => {
+    const userID = req.params.userID;
+    db.query("DELETE FROM user WHERE userID = ?", userID, (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(result);
+        }
+    });
+});
+
+app.listen(3001, () => {
     console.log("Success! Port: 3001");
 });
