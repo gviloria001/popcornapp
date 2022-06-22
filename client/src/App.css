@@ -1,38 +1,50 @@
+html{
+  margin: 0;
+  height: 100%;
+}
+
 .App {
+  margin: 0;
+  height: 100%;
+}
+body {
+  margin: 0;
+  height: 100%;
+}
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+.site-layout {
+  margin: 0;
+  display: grid;
+  height: 100%;
+  grid-template-areas: 
+    "header_section"  
+    "report_section"
+    "Site-content_section"
+    "footer_section";
+  grid-template-rows: 50px 100px auto 20px;
+}
+.header {
+  font: 40px black bold;
   text-align: center;
+  grid-area: "header_section";
+  background-color: grey;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.report-bar {
+  text-align: center;
+  grid-area: "header_section";
+  background-color: #F0F0F0;
+  border-bottom: 1px black solid;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.site-content {
+  grid-area: 'Site-content_section';
+  background-color: #F0F0F0;
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.footer {
+  text-align: center;
+  grid-area: 'footer_section';
+  background-color: grey;
 }

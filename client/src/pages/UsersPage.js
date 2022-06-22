@@ -58,8 +58,8 @@ export default function UsersPage() {
 
 
     return (
-        <div className="App">
-            <div className="information">
+        <div>
+            <div>
                 <label>First Name:</label>
                 <input
                     type="text"

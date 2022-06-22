@@ -1,29 +1,21 @@
-
+import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Home from './pages/Home';
 import SignInPage from './pages/SignIn';
-import UsersPage from './pages/UsersPage'
+import UsersPage from './pages/UsersPage';
+import DB from './pages/DB';
 
 
 
 function App() {
   return (
-    <div className="App">
-
-      <div>
-        123
-      </div>
-      <BrowserRouter>
+        <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<SignInPage />} />
           <Route path="/SignInPage" element={<SignInPage />} />
           <Route path="/UsersPage" element={<UsersPage />} />
+          <Route path="/DB" element={<DB />} />
         </Routes>
       </BrowserRouter>
-      <div>
-        hi
-      </div>
-    </div>
   );
 }
 
