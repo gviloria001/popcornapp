@@ -23,7 +23,7 @@ body {
   grid-template-areas: 
     "header_section"  
     "report_section"
-    "Site-content_section"
+    "site-content_section"
     "footer_section";
   grid-template-rows: 50px 100px auto 20px;
 }
@@ -40,11 +40,36 @@ body {
   border-bottom: 1px black solid;
 }
 .site-content {
-  grid-area: 'Site-content_section';
+  overflow-y: scroll;
+  grid-area: "site-content_section";
   background-color: #F0F0F0;
+}
+.site-content table {
+  margin: 0;
 }
 .footer {
   text-align: center;
   grid-area: 'footer_section';
   background-color: grey;
+}
+
+/*                            */
+.query-container {
+  margin: 0;
+  height: 100%;
+  overflow-x: scroll;
+  width: 100%;
+}
+
+.query-contents{
+  margin: 0;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  flex-direction: row;
+  align-items: center;
+}
+
+.query-contents div {
+  border: 1px black solid;
 }

@@ -50,7 +50,7 @@ app.post('/accountinfo', (req, res) => {
 })
 
 app.get('/users', (req, res) => {
-    db.query("SELECT * FROM user", (err, result) => {
+    db.query("SELECT * FROM user ORDER BY userLastName", (err, result) => {
         if (err) {
             console.log(err);
         }
