@@ -57,7 +57,6 @@ export default function DB() {
 
     return (
         <div className='site-layout'>
-<<<<<<< HEAD
       <div className='header'>
         Popcorn Theaters
       </div>
@@ -151,26 +150,5 @@ export default function DB() {
         All Rights Reversed
       </div>
     </div>
-=======
-            <div className='header'>
-                Popcorn Theaters
-            </div>
-            <div className='report-bar'>
-                <button onClick={() => setVisible(!visible)}>{visible ? 'Show' : 'Hide'}
-                </button>
-                {visible &&
-                    <button>
-                        My element
-                    </button>
-                }
-            </div>
-            <div className='site-content'>
-
-            </div>
-            <div className='footer'>
-                All Rights Reversed
-            </div>
-        </div>
->>>>>>> 45738e2f03579eee7b824ec8fc32413a8b8452da
     )
 }
