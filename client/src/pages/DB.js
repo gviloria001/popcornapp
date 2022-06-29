@@ -3,6 +3,32 @@ import { useState } from "react"
 
 export default function DB() {
     const [visible, setVisible] = useState(false);
+    const [queryState, setQueryState] = useState(false);
+
+    // Inventory Queries ///////////////////////////////////////////
+    const [productName, setProductName] = useState("");
+    const [productID, setProductID] = useState("");
+    const [productIsFood, setProductIsFood] = useState();
+    const [productIsContainer, setProductIsContainer] = useState();
+    const [inventoryList, setInventoryList] = useState([]);
+
+    const [locationName, setLocationName] = useState("");
+
+
+    
+    const queryInventory = () => {
+        setQueryState(false);
+        if (theaterName === 'All')
+        {
+            Axios.get("http://localhost:3001/allInventory").then((res) => {
+            setInventoryList(res.data);
+            })
+        }
+        else {
+            console.log('else')
+        }
+        
+    }
 
 
     // CRUD USERS //////////////////////////////////////////////////
@@ -13,6 +39,14 @@ export default function DB() {
     const [userAccountName, setUserAccountName] = useState("");
     const [userAccountPassword, setUserAccountpassword] = useState("");
     const [userList, setUserList] = useState([]);
+    const [theaterName, setTheaterName] = useState("");
+
+
+    // CRUD USERBELONGSTO /////////////////////////////////////////
+    const [theaterID, setTheaterID] = useState();
+    const [isAdmin, setIsAdmin] = useState();
+    const [isManager, setIsManager] = useState();
+
 
     const addUser = () => {
         Axios.post("http://localhost:3001/addUser", {
@@ -22,6 +56,10 @@ export default function DB() {
             userPhoneNumber: userPhoneNumber,
             userAccountName: userAccountName,
             userAccountPassword: userAccountPassword,
+            theaterID: theaterID,
+            isAdmin: isAdmin,
+            isManager: isManager,
+
         }).then(() => {
             setUserList([
                 ...userList,
@@ -30,6 +68,10 @@ export default function DB() {
                     userLastName: userLastName,
                     userEmail: userEmail,
                     userPhoneNumber: userPhoneNumber,
+                    theaterName: theaterName,
+                    isAdmin: isAdmin,
+                    isManager: isManager,
+
                 },
             ])
         })
@@ -48,10 +90,13 @@ export default function DB() {
 
 
     const getUsers = () => {
+        setQueryState(true);
         Axios.get("http://localhost:3001/users").then((res) => {
             setUserList(res.data);
         })
     }
+
+
 
     ///////////////////////////////////////////////////////////////
 
@@ -61,8 +106,44 @@ export default function DB() {
         Popcorn Theaters
       </div>
       <div className='report-bar'> 
-        <button onClick={() => setVisible(!visible)}>{visible ? 'Hide' : 'Show'}
+        <button onClick={() => setVisible(!visible)}>{visible ? 'Inventory' : 'Users'}
         </button>
+
+        {!visible && 
+            <div>
+            <div>
+                <label>Product Name:</label>
+                <input
+                    type="text"
+                    onChange={(event) => {
+                        setProductName(event.target.value);
+                    }}
+                />
+                <label>Location:</label>
+                <input
+                    type="text"
+                    onChange={(event) => {
+                        setLocationName(event.target.value);
+                    }}
+                />
+                <label>Theater:</label>
+                <select onChange = { e => setTheaterName(e.target.value)}>
+                    <option onChange = {e => {setTheaterName('All')}}>All</option>
+                    <option onChange = {e => {setTheaterName('Del Amo')}}>Del Amo</option>
+                    <option onChange = {e => {setTheaterName('Rolling Hills')}}>Rolling Hills</option>
+                    <option onChange = {e => {setTheaterName('South Bay Galleria')}}>South Bay Galleria</option>
+                    <option onChange = {e => {setTheaterName('South Bay Pavilion')}}>South Bay Pavilion</option>
+                </select>
+                <button onClick={queryInventory}>New Report</button>
+            </div>
+
+            <div>
+                <button onClick={queryInventory}>All Inventory</button>
+            </div>
+        </div>
+        }
+
+        
         {visible && 
             <div>
             <div>
@@ -108,6 +189,27 @@ export default function DB() {
                         setUserAccountpassword(event.target.value);
                     }}
                 />
+                <label>Theater ID</label>
+                <input
+                    type="text"
+                    onChange={(event) => {
+                        setTheaterID(event.target.value);
+                    }}
+                />
+                <label>isAdmin</label>
+                <input
+                    type="text"
+                    onChange={(event) => {
+                        setIsAdmin(event.target.value);
+                    }}
+                />
+                <label>isManager</label>
+                <input
+                    type="text"
+                    onChange={(event) => {
+                        setIsManager(event.target.value);
+                    }}
+                />
                 <button onClick={addUser}>Add User</button>
             </div>
 
@@ -117,9 +219,36 @@ export default function DB() {
         </div>
         }
       </div>
-      <div className='site-content'> 
+
+      <div className='site-content'>
+      {!queryState &&
             <table>
-                <tr>
+                <tbody>
+                    <tr>
+                    <th>
+                        Product Name
+                    </th>
+                    <th>
+                        Total Quantity
+                    </th>
+                </tr>
+                {inventoryList.map((val) => {
+                    return (
+                        <tr key={val.productName}>
+                            <td>{val.productName} </td>
+                            <td>{val.total}</td>
+                        </tr>
+                    );
+                })}
+                </tbody>
+                
+            </table>
+        }
+
+        {queryState &&
+            <table>
+                <tbody>
+                    <tr>
                     <th>
                         Last Name
                     </th>
@@ -132,6 +261,12 @@ export default function DB() {
                     <th>
                         Phone Number
                     </th>
+                    <th>
+                        Theater
+                    </th>
+                    <th>
+                        ID
+                    </th>
                 </tr>
                 {userList.map((val) => {
                     return (
@@ -140,12 +275,18 @@ export default function DB() {
                             <td>{val.userFirstName} </td>
                             <td>{val.userEmail} </td>
                             <td>{val.userPhoneNumber} </td>
-                            <button onClick={() => { deleteUser(val.userID) }}> Delete User </button>
+                            <td>{val.theaterName} </td>
+                            <td>{val.userID}</td>
+                            <td><button onClick={() => { deleteUser(val.userID) }}> Delete User </button></td>
                         </tr>
                     );
                 })}
+                </tbody>
+                
             </table>
+        }
       </div>
+      
       <div className='footer'>
         All Rights Reversed
       </div>

@@ -5,14 +5,30 @@ const cors = require('cors');
 
 app.use(cors());
 app.use(express.json())
+
 const db = mysql.createConnection({
     user: 'root',
     host: 'localhost',
     password: 'password',
     database: 'pcdb',
+    multipleStatements: true,
 });
 
 
+app.get('/allInventory', (req, res) => {
+    db.query("SELECT productName, sum(totalQuantity) as 'total' " +
+    "from product " +
+    "JOIN productlist " +
+    "using (productID) " +
+    "GROUP BY productName", (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.send(result);
+        }
+    });
+});
 
 app.post("/addUser", (req, res) => {
     const userFirstName = req.body.userFirstName;
@@ -21,10 +37,14 @@ app.post("/addUser", (req, res) => {
     const userPhoneNumber = req.body.userPhoneNumber;
     const userAccountName = req.body.userAccountName;
     const userAccountPassword = req.body.userAccountPassword;
+    const theaterID = req.body.theaterID;
+    const isManager = req.body.isManager;
+    const isAdmin = req.body.isAdmin;
 
     db.query(
-        "INSERT INTO user (userFirstName, userLastName, userEmail, userPhoneNumber, userAccountName, userAccountPassword ) VALUES (?,?,?,?,?,?)",
-        [userFirstName, userLastName, userEmail, userPhoneNumber, userAccountName, userAccountPassword],
+        "INSERT INTO user (userFirstName, userLastName, userEmail, userPhoneNumber, userAccountName, userAccountPassword ) VALUES (?,?,?,?,?,?); " + 
+        " INSERT INTO userbelongsto (userID, theaterID, isAdmin, isManager) VALUES (LAST_INSERT_ID(), ?, ?, ?)",
+        [userFirstName, userLastName, userEmail, userPhoneNumber, userAccountName, userAccountPassword, theaterID, isAdmin, isManager],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -43,14 +63,20 @@ app.post('/accountinfo', (req, res) => {
             console.log(err);
         }
         else {
-            console.log(result);
             res.send(result);
         }
     });
-})
+});
 
 app.get('/users', (req, res) => {
-    db.query("SELECT * FROM user ORDER BY userLastName", (err, result) => {
+    db.query("SELECT userFirstName, userLastName, theaterName, userEmail, userPhoneNumber, userID " +
+        "from user " +
+        "join userbelongsto " +
+        "using (userID )" +
+        "join theater " +
+        "using (theaterID) " +
+        "ORDER BY userLastName, " +
+        "userFirstName", (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -58,11 +84,12 @@ app.get('/users', (req, res) => {
             res.send(result);
         }
     });
-})
+});
 
 app.delete("/delete/:userID", (req, res) => {
     const userID = req.params.userID;
-    db.query("DELETE FROM user WHERE userID = ?", userID, (err, result) => {
+    db.query("DELETE FROM userbelongsto WHERE userID = ?; " + 
+        "DELETE FROM user WHERE userID = ?", [userID, userID], (err, result) => {
         if (err) {
             console.log(err);
         } else {

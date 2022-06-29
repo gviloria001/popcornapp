@@ -45,7 +45,22 @@ body {
   background-color: #F0F0F0;
 }
 .site-content table {
+  width: 100%;
   margin: 0;
+}
+
+.site-content table tr th{
+  border-spacing: 0px;
+  border: 1px solid black;
+  padding: 1px;
+  margin: 0px;
+}
+
+.site-content table tr td{
+  border-spacing: 0px;
+  border: 1px solid black;
+  padding: 1px;
+  margin: 0px;
 }
 .footer {
   text-align: center;
