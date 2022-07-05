@@ -15,12 +15,34 @@ const db = mysql.createConnection({
 });
 
 
-app.get('/allInventory', (req, res) => {
-    db.query("SELECT productName, sum(totalQuantity) as 'total' " +
-    "from product " +
-    "JOIN productlist " +
-    "using (productID) " +
-    "GROUP BY productName", (err, result) => {
+const whichTheater = (theaterName) => {
+    switch (theaterName) {
+        case 'All':
+            return ``;
+        case 'Del Amo':
+            return `where theaterName = 'Del Amo'`
+        case 'South Bay Pavilion':
+            return `where theaterName = 'South Bay Pavilion'`
+        case 'Rolling Hills':
+            return `where theaterName = 'Rolling Hills'`
+        case 'South Bay Galleria':
+            return `where theaterName = 'South Bay Galleria'`
+        default:
+            return ``;
+    };
+}
+
+
+app.get(':theaterName/locationList', (req, res) => {
+    var theaterName = req.params.theaterName;
+    console.log('SUCCESS');
+    const query = "SELECT locationName " +
+        "FROM location " +
+        "JOIN theater " +
+        "USING (theaterID) " +
+        "WHERE theaterName = " + theaterName;
+
+    db.query(query, (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -28,6 +50,53 @@ app.get('/allInventory', (req, res) => {
             res.send(result);
         }
     });
+
+})
+
+app.get('http://localhost:3001/inventory/Product=:productName/Location=:locationName/Theater=:theaterName', (req, res) => {
+    var productName = req.params.productName;
+    var locationName = req.params.locationName;
+    var theaterName = req.params.theaterName;
+    const query = "SELECT locationName, productName,  quantity, theaterName " +
+        "FROM product " +
+        "JOIN productlocation " +
+        "USING (productID) " +
+        "JOIN location " +
+        "USING (locationID) " +
+        "JOIN theater " +
+        "USING (theaterID) " +
+        whichTheater(theaterName);
+
+
+    db.query(query, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.send(result);
+        }
+    });
+})
+
+app.get('/inventory/:theaterName', (req, res) => {
+    var theaterName = req.params.theaterName;
+
+
+    const query = "SELECT productName, totalQuantity, theaterName " +
+        "FROM productlist " +
+        "JOIN product " +
+        "USING (productid) " +
+        "join theater " +
+        "USING (theaterID) " + whichTheater(theaterName)
+    db.query(query, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.send(result);
+        }
+    });
+
 });
 
 app.post("/addUser", (req, res) => {
@@ -42,7 +111,7 @@ app.post("/addUser", (req, res) => {
     const isAdmin = req.body.isAdmin;
 
     db.query(
-        "INSERT INTO user (userFirstName, userLastName, userEmail, userPhoneNumber, userAccountName, userAccountPassword ) VALUES (?,?,?,?,?,?); " + 
+        "INSERT INTO user (userFirstName, userLastName, userEmail, userPhoneNumber, userAccountName, userAccountPassword ) VALUES (?,?,?,?,?,?); " +
         " INSERT INTO userbelongsto (userID, theaterID, isAdmin, isManager) VALUES (LAST_INSERT_ID(), ?, ?, ?)",
         [userFirstName, userLastName, userEmail, userPhoneNumber, userAccountName, userAccountPassword, theaterID, isAdmin, isManager],
         (err, result) => {
@@ -76,26 +145,26 @@ app.get('/users', (req, res) => {
         "join theater " +
         "using (theaterID) " +
         "ORDER BY userLastName, " +
-        "userFirstName", (err, result) => {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            res.send(result);
-        }
-    });
+        "userID", (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                res.send(result);
+            }
+        });
 });
 
 app.delete("/delete/:userID", (req, res) => {
     const userID = req.params.userID;
-    db.query("DELETE FROM userbelongsto WHERE userID = ?; " + 
+    db.query("DELETE FROM userbelongsto WHERE userID = ?; " +
         "DELETE FROM user WHERE userID = ?", [userID, userID], (err, result) => {
-        if (err) {
-            console.log(err);
-        } else {
-            res.send(result);
-        }
-    });
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+        });
 });
 
 app.listen(3001, () => {
