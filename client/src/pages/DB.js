@@ -5,44 +5,6 @@ export default function DB() {
     const [visible, setVisible] = useState(false);
     const [queryState, setQueryState] = useState(false);
 
-    // Inventory Queries ///////////////////////////////////////////
-    const [productName, setProductName] = useState("");
-    const [productID, setProductID] = useState("");
-    const [productIsFood, setProductIsFood] = useState();
-    const [productIsContainer, setProductIsContainer] = useState();
-    const [inventoryList, setInventoryList] = useState([]);
-    const [inventoryListLocations, setInventoryListLocations] = useState([]);
-
-    const [locationList, setLocationList] = useState([]);
-    const [locationName, setLocationName] = useState("");
-
-
-    const countLocations = (theaterName) => {
-        Axios.get(`http://localhost:3001/${theaterName}/locationList`).then((res) => {
-            console.log(res.data);
-            setLocationList(res.data);
-        })
-    }
-
-
-    const queryInventory = () => {
-        setQueryState(false);
-        if (theaterName === 'Select Theater' || theaterName === '') {
-            alert("Please select a theater.");
-        }
-        else {
-            Axios.get(`http://localhost:3001/inventory/${theaterName}`).then((res) => {
-                console.log(res.data);
-                setInventoryList(res.data);
-                console.log(inventoryList);
-            })
-
-            Axios.get(`http://localhost:3001/inventory/Product=${productName}/Location=${locationName}/Theater=${theaterName}`).then((res) => {
-                setInventoryListLocations(res.data);
-                console.log(inventoryListLocations);
-            })
-        }
-    }
 
 
     // CRUD USERS //////////////////////////////////////////////////
@@ -60,6 +22,50 @@ export default function DB() {
     const [theaterID, setTheaterID] = useState();
     const [isAdmin, setIsAdmin] = useState();
     const [isManager, setIsManager] = useState();
+    // Inventory Queries ///////////////////////////////////////////
+    const [productName, setProductName] = useState("");
+    const [productID, setProductID] = useState("");
+    const [productIsFood, setProductIsFood] = useState();
+    const [productIsContainer, setProductIsContainer] = useState();
+    const [inventoryList, setInventoryList] = useState([]);
+    const [inventoryListLocations, setInventoryListLocations] = useState([]);
+
+    const [locationList, setLocationList] = useState([]);
+    const [locationName, setLocationName] = useState("");
+
+
+    const countLocations = (paramTheater) => {
+        console.log('inside countlocations')
+        Axios.get(`http://localhost:3001/${paramTheater}/locationList`).then((res) => {
+            console.log(res.data);
+            setLocationList(res.data);
+        })
+    }
+
+    const handleTheaterChange = (paramTheater) => {
+        setTheaterName(paramTheater);
+        countLocations(theaterName)
+    }
+
+    const queryInventory = () => {
+        setQueryState(false);
+        if (theaterName === 'Select Theater' || theaterName === '') {
+            alert("Please select a theater.");
+        }
+        else {
+            Axios.get(`http://localhost:3001/inventory/${theaterName}`).then((res) => {
+                console.log(res.data);
+                setInventoryList(res.data);
+                console.log(inventoryList);
+            })
+
+            Axios.get(`http://localhost:3001/inventory/Product=${productName}/Location=${locationName}/Theater=${theaterName}`).then((res) => {
+                console.log("Inside Locations Query");
+                setInventoryListLocations(res.data);
+                console.log(inventoryListLocations);
+            })
+        }
+    }
 
 
     const addUser = () => {
@@ -144,12 +150,12 @@ export default function DB() {
                             </select>
 
                             <label>Theater:</label>
-                            <select onChange={e => setTheaterName(e.target.value)}>
-                                <option onChange={e => { setTheaterName('') }}>Select Theater</option>
-                                <option onChange={e => { setTheaterName('Del Amo') }}>Del Amo</option>
-                                <option onChange={e => { setTheaterName('Rolling Hills') }}>Rolling Hills</option>
-                                <option onChange={e => { setTheaterName('South Bay Galleria') }}>South Bay Galleria</option>
-                                <option onChange={e => { setTheaterName('South Bay Pavilion') }}>South Bay Pavilion</option>
+                            <select onChange={e => handleTheaterChange(e.target.value)}>
+                                <option onChange={e => { handleTheaterChange('') }}>Select Theater</option>
+                                <option onChange={e => { handleTheaterChange('Del Amo') }}>Del Amo</option>
+                                <option onChange={e => { handleTheaterChange('Rolling Hills') }}>Rolling Hills</option>
+                                <option onChange={e => { handleTheaterChange('South Bay Galleria') }}>South Bay Galleria</option>
+                                <option onChange={e => { handleTheaterChange('South Bay Pavilion') }}>South Bay Pavilion</option>
                             </select>
                         </div>
 
