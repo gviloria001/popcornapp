@@ -2,8 +2,8 @@ import Axios from "axios";
 import { useState } from "react"
 
 export default function DB() {
-    const [visible, setVisible] = useState(false);
-    const [queryState, setQueryState] = useState(false);
+    const [queryState, setQueryState] = useState('Inventory');
+    const [inventoryState, setInventoryState] = useState('Location');
 
 
 
@@ -22,11 +22,11 @@ export default function DB() {
     const [theaterID, setTheaterID] = useState();
     const [isAdmin, setIsAdmin] = useState();
     const [isManager, setIsManager] = useState();
+
+
+
     // Inventory Queries ///////////////////////////////////////////
-    const [productName, setProductName] = useState("");
-    const [productID, setProductID] = useState("");
-    const [productIsFood, setProductIsFood] = useState();
-    const [productIsContainer, setProductIsContainer] = useState();
+    const [productName, setProductName] = useState("All");
     const [inventoryList, setInventoryList] = useState([]);
     const [inventoryListLocations, setInventoryListLocations] = useState([]);
 
@@ -35,32 +35,45 @@ export default function DB() {
 
 
     const countLocations = (paramTheater) => {
-        console.log('inside countlocations')
         Axios.get(`http://localhost:3001/${paramTheater}/locationList`).then((res) => {
-            console.log(res.data);
             setLocationList(res.data);
         })
     }
 
+    const handleLocationChange = (paramLocation) => {
+        setLocationName(paramLocation);
+    }
+
+    const handleProductChange = (paramProductName) => {
+        switch (paramProductName){
+            case '':
+                return setProductName(' ');
+            default:
+                return setProductName(paramProductName)
+        }
+    }
+
     const handleTheaterChange = (paramTheater) => {
         setTheaterName(paramTheater);
-        countLocations(theaterName)
+        countLocations(paramTheater);
+    }
+
+    const queryShowAll = () => {
+        setQueryState('Inventory');
+        setInventoryState('Show All Inventory');
+            Axios.get(`http://localhost:3001/inventory/ShowAll`).then((res) => {
+            setInventoryList(res.data);
+        })
     }
 
     const queryInventory = () => {
-        setQueryState(false);
+        setQueryState('Inventory');
+        setInventoryState('Inventory');
         if (theaterName === 'Select Theater' || theaterName === '') {
             alert("Please select a theater.");
         }
         else {
-            Axios.get(`http://localhost:3001/inventory/${theaterName}`).then((res) => {
-                console.log(res.data);
-                setInventoryList(res.data);
-                console.log(inventoryList);
-            })
-
-            Axios.get(`http://localhost:3001/inventory/Product=${productName}/Location=${locationName}/Theater=${theaterName}`).then((res) => {
-                console.log("Inside Locations Query");
+            Axios.get(`http://localhost:3001/${productName}/${locationName}/${theaterName}`).then((res) => {
                 setInventoryListLocations(res.data);
                 console.log(inventoryListLocations);
             })
@@ -110,7 +123,7 @@ export default function DB() {
 
 
     const getUsers = () => {
-        setQueryState(true);
+        setQueryState('Users');
         Axios.get("http://localhost:3001/users").then((res) => {
             setUserList(res.data);
         })
@@ -126,33 +139,38 @@ export default function DB() {
                 Popcorn Theaters
             </div>
             <div className='report-bar'>
-                <button onClick={() => setVisible(!visible)}>{visible ? 'Inventory' : 'Users'}
-                </button>
+                {queryState === 'Users' && <button onClick={() => {setQueryState('Inventory'); setInventoryState('Inventory')}}>Inventory
+                </button>}
 
-                {!visible &&
+                {queryState === 'Inventory' && <button onClick={() => {setQueryState('Users'); setInventoryState('Users')}}>Users
+                </button>}
+                
+                {queryState === 'Inventory' &&
                     <div>
                         <div>
                             <label>Product Name:</label>
                             <input
                                 type="text"
                                 onChange={(event) => {
-                                    setProductName(event.target.value);
+                                    handleProductChange(event.target.value);
                                 }}
                             />
                             <label>Location:</label>
 
-                            <select onChange={e => setTheaterName(e.target.value)}>
-                                <option onChange={e => { setTheaterName(''); countLocations('') }}>Select Theater</option>
-                                <option onChange={e => { setTheaterName('Del Amo'); countLocations('Del Amo') }}>Del Amo</option>
-                                <option onChange={e => { setTheaterName('Rolling Hills'); countLocations('Rolling Hills') }}>Rolling Hills</option>
-                                <option onChange={e => { setTheaterName('South Bay Galleria'); countLocations('South Bay Galleria') }}>South Bay Galleria</option>
-                                <option onChange={e => { setTheaterName('South Bay Pavilion'); countLocations('South Bay Pavilion') }}>South Bay Pavilion</option>
+                            <select onChange={e => setLocationName(e.target.value)}>
+                                <option value=''>Select Location</option>
+                                <option>All</option>
+                                {locationList.map((val) => {
+                                    return (
+                                        <option key = {val.locationName}value = {val.locationName}>{val.locationName}</option>                                  
+                                    );
+                                })}     
                             </select>
 
                             <label>Theater:</label>
                             <select onChange={e => handleTheaterChange(e.target.value)}>
                                 <option onChange={e => { handleTheaterChange('') }}>Select Theater</option>
-                                <option onChange={e => { handleTheaterChange('Del Amo') }}>Del Amo</option>
+                                <option value = {'Del Amo'}>Del Amo</option>
                                 <option onChange={e => { handleTheaterChange('Rolling Hills') }}>Rolling Hills</option>
                                 <option onChange={e => { handleTheaterChange('South Bay Galleria') }}>South Bay Galleria</option>
                                 <option onChange={e => { handleTheaterChange('South Bay Pavilion') }}>South Bay Pavilion</option>
@@ -160,13 +178,14 @@ export default function DB() {
                         </div>
 
                         <div>
-                            <button onClick={() => { queryInventory() }}>New Report</button>
+                            <button onClick={() => { queryInventory(); setInventoryState('Location') }}>New Report</button>
+                            <button onClick={() => { queryShowAll(); setInventoryState('Show All Inventory')  }}>Show All Inventory</button>
                         </div>
                     </div>
-                }
+                } 
 
 
-                {visible &&
+                {queryState === 'Users' &&
                     <div>
                         <div>
                             <label>First Name:</label>
@@ -243,7 +262,38 @@ export default function DB() {
             </div>
 
             <div className='site-content'>
-                {!queryState &&
+                {inventoryState === 'Location' &&
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th>
+                                    Product Name
+                                </th>
+                                <th>
+                                    Location Name
+                                </th>
+                                <th>
+                                    Total Quantity
+                                </th>
+                                <th>
+                                    Theater
+                                </th>
+                            </tr>
+                            {inventoryListLocations.map((val) => {
+                                return (
+                                    <tr key={val.productName}>
+                                        <td>{val.productName} </td>
+                                        <td>{val.locationName}</td>
+                                        <td>{val.quantity}</td>
+                                        <td>{val.theaterName}</td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+
+                    </table>
+                }
+                {inventoryState=== 'Show All Inventory' &&
                     <table>
                         <tbody>
                             <tr>
@@ -271,7 +321,7 @@ export default function DB() {
                     </table>
                 }
 
-                {queryState &&
+                {inventoryState === 'Users' &&
                     <table>
                         <tbody>
                             <tr>

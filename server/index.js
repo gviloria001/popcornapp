@@ -18,29 +18,47 @@ const db = mysql.createConnection({
 const whichTheater = (theaterName) => {
     switch (theaterName) {
         case 'All':
-            return ``;
+            return `1`;
         case 'Del Amo':
-            return `where theaterName = 'Del Amo'`
+            return `theaterName = 'Del Amo'`
         case 'South Bay Pavilion':
-            return `where theaterName = 'South Bay Pavilion'`
+            return `theaterName = 'South Bay Pavilion'`
         case 'Rolling Hills':
-            return `where theaterName = 'Rolling Hills'`
+            return `theaterName = 'Rolling Hills'`
         case 'South Bay Galleria':
-            return `where theaterName = 'South Bay Galleria'`
+            return `theaterName = 'South Bay Galleria'`
         default:
             return ``;
     };
 }
 
+const whichLocation = (locationName) => {
+    switch (locationName) {
+        case 'All':
+            return `1`;
+        default:
+            return `locationName = ` + JSON.stringify(locationName)
+    }
+}
 
-app.get(':theaterName/locationList', (req, res) => {
+const whichProductName = (productName) => {
+    switch (productName) {
+        case '':
+            return `1`;
+        case 'All':
+            return `1`;
+        default:
+            return `productName LIKE '%` + productName + "%'"
+    }
+}
+
+app.get('/:theaterName/locationList', (req, res) => {
     var theaterName = req.params.theaterName;
-    console.log('SUCCESS');
-    const query = "SELECT locationName " +
+    const query = "SELECT locationName, theaterName " +
         "FROM location " +
         "JOIN theater " +
         "USING (theaterID) " +
-        "WHERE theaterName = " + theaterName;
+        "WHERE " + whichTheater(theaterName);
 
     db.query(query, (err, result) => {
         if (err) {
@@ -53,22 +71,26 @@ app.get(':theaterName/locationList', (req, res) => {
 
 })
 
-app.get('http://localhost:3001/inventory/Product=:productName/Location=:locationName/Theater=:theaterName', (req, res) => {
-    var productName = req.params.productName;
-    var locationName = req.params.locationName;
-    var theaterName = req.params.theaterName;
-    const query = "SELECT locationName, productName,  quantity, theaterName " +
-        "FROM product " +
-        "JOIN productlocation " +
-        "USING (productID) " +
-        "JOIN location " +
-        "USING (locationID) " +
+app.get('/:productName/:locationName/:theaterName', (req, res) => {
+    const theaterName = req.params.theaterName;
+    const locationName = req.params.locationName;
+    const productName = req.params.productName;
+
+    const bol = true;
+    const query1 = 
+        "SELECT locationName, productName, quantity, theaterName " +
+        "FROM location " +
         "JOIN theater " +
         "USING (theaterID) " +
-        whichTheater(theaterName);
+        "JOIN productlocation " +
+        "USING (locationID) " +
+        "JOIN product " +
+        "USING (productID) " + 
+        "where " + whichTheater(theaterName) +
+        " AND " + whichLocation(locationName) +
+        " AND " + whichProductName(productName)
 
-
-    db.query(query, (err, result) => {
+    db.query(query1, (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -76,18 +98,20 @@ app.get('http://localhost:3001/inventory/Product=:productName/Location=:location
             res.send(result);
         }
     });
-})
 
-app.get('/inventory/:theaterName', (req, res) => {
-    var theaterName = req.params.theaterName;
+});
+
+app.get('/inventory/ShowAll', (req, res) => {
 
 
-    const query = "SELECT productName, totalQuantity, theaterName " +
-        "FROM productlist " +
-        "JOIN product " +
-        "USING (productid) " +
-        "join theater " +
-        "USING (theaterID) " + whichTheater(theaterName)
+    const query = 
+    "SELECT productName, totalQuantity, theaterName " +
+    "FROM productlist " +
+    "JOIN product " +
+    "USING (productid) " +
+    "JOIN theater " +
+    "USING (theaterID) " +
+    "ORDER BY theaterName ASC"
     db.query(query, (err, result) => {
         if (err) {
             console.log(err);
