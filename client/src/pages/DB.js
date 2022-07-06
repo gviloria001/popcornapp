@@ -1,5 +1,5 @@
 import Axios from "axios";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export default function DB() {
     const [queryState, setQueryState] = useState('Inventory');
@@ -29,9 +29,16 @@ export default function DB() {
     const [productName, setProductName] = useState("All");
     const [inventoryList, setInventoryList] = useState([]);
     const [inventoryListLocations, setInventoryListLocations] = useState([]);
-
+    const [theaterList, setTheaterList] = useState([]);
     const [locationList, setLocationList] = useState([]);
     const [locationName, setLocationName] = useState("");
+
+
+    useEffect(()=>{
+        Axios.get('http://localhost:3001/theaterList').then((res) => {
+            setTheaterList(res.data);
+        })
+    },[])
 
 
     const countLocations = (paramTheater) => {
@@ -170,10 +177,11 @@ export default function DB() {
                             <label>Theater:</label>
                             <select onChange={e => handleTheaterChange(e.target.value)}>
                                 <option onChange={e => { handleTheaterChange('') }}>Select Theater</option>
-                                <option value={'Del Amo'}>Del Amo</option>
-                                <option onChange={e => { handleTheaterChange('Rolling Hills') }}>Rolling Hills</option>
-                                <option onChange={e => { handleTheaterChange('South Bay Galleria') }}>South Bay Galleria</option>
-                                <option onChange={e => { handleTheaterChange('South Bay Pavilion') }}>South Bay Pavilion</option>
+                                {theaterList.map((val) => {
+                                    return (
+                                        <option key={val.theaterName} value={val.theaterName}>{val.theaterName}</option>
+                                    );
+                                })}
                             </select>
                         </div>
 
@@ -294,31 +302,42 @@ export default function DB() {
                     </table>
                 }
                 {inventoryState === 'Show All Inventory' &&
-                    <table>
-                        <tbody>
-                            <tr>
-                                <th>
-                                    Product Name
-                                </th>
-                                <th>
-                                    Total Quantity
-                                </th>
-                                <th>
-                                    Theater
-                                </th>
-                            </tr>
-                            {inventoryList.map((val) => {
+                            <div>{theaterList.map((theaterName) => {
                                 return (
-                                    <tr key={val.productName}>
-                                        <td>{val.productName} </td>
-                                        <td>{val.totalQuantity}</td>
-                                        <td>{val.theaterName}</td>
-                                    </tr>
+                                    <table>
+                                        <tr key={theaterName.theaterName}>
+                                            <th colspan="2">
+                                                {theaterName.theaterName}
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Total Quantity</th>
+                                        </tr>
+                                        {inventoryList.map((key) => {
+                                            if (key.theaterName === theaterName.theaterName){
+                                                return (
+                                                    <tr>    
+                                                        {key.theaterName === theaterName.theaterName && 
+                                                            <td> 
+                                                                {key.productName} 
+                                                            </td>}
+                                                        {key.theaterName === theaterName.theaterName && 
+                                                            <td>
+                                                                {key.totalQuantity}
+                                                            </td>
+                                                        }
+                                                    </tr>
+                                                )
+                                            }
+                                            return null
+                                        })}
+                                        <br></br>
+                                        <br></br>
+                                    </table>
                                 );
                             })}
-                        </tbody>
-
-                    </table>
+                        </div>
                 }
 
                 {inventoryState === 'Users' &&

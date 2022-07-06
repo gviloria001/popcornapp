@@ -52,6 +52,20 @@ const whichProductName = (productName) => {
     }
 }
 
+app.get('/theaterList', (req, res) => {
+    const query = "SELECT theaterName " +
+        "FROM theater";
+
+    db.query(query, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.send(result);
+        }
+    });
+})
+
 app.get('/:theaterName/locationList', (req, res) => {
     var theaterName = req.params.theaterName;
     const query = "SELECT locationName, theaterName " +
