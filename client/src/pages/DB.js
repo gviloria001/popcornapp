@@ -45,7 +45,7 @@ export default function DB() {
     }
 
     const handleProductChange = (paramProductName) => {
-        switch (paramProductName){
+        switch (paramProductName) {
             case '':
                 return setProductName(' ');
             default:
@@ -61,7 +61,7 @@ export default function DB() {
     const queryShowAll = () => {
         setQueryState('Inventory');
         setInventoryState('Show All Inventory');
-            Axios.get(`http://localhost:3001/inventory/ShowAll`).then((res) => {
+        Axios.get(`http://localhost:3001/inventory/ShowAll`).then((res) => {
             setInventoryList(res.data);
         })
     }
@@ -75,7 +75,6 @@ export default function DB() {
         else {
             Axios.get(`http://localhost:3001/${productName}/${locationName}/${theaterName}`).then((res) => {
                 setInventoryListLocations(res.data);
-                console.log(inventoryListLocations);
             })
         }
     }
@@ -139,12 +138,13 @@ export default function DB() {
                 Popcorn Theaters
             </div>
             <div className='report-bar'>
-                {queryState === 'Users' && <button onClick={() => {setQueryState('Inventory'); setInventoryState('Inventory')}}>Inventory
+
+                {queryState === 'Users' && <button onClick={() => { setQueryState('Inventory'); setInventoryState('Inventory') }}>Inventory
                 </button>}
 
-                {queryState === 'Inventory' && <button onClick={() => {setQueryState('Users'); setInventoryState('Users')}}>Users
+                {queryState === 'Inventory' && <button onClick={() => { setQueryState('Users'); setInventoryState('Users') }}>Users
                 </button>}
-                
+
                 {queryState === 'Inventory' &&
                     <div>
                         <div>
@@ -162,15 +162,15 @@ export default function DB() {
                                 <option>All</option>
                                 {locationList.map((val) => {
                                     return (
-                                        <option key = {val.locationName}value = {val.locationName}>{val.locationName}</option>                                  
+                                        <option key={val.locationName} value={val.locationName}>{val.locationName}</option>
                                     );
-                                })}     
+                                })}
                             </select>
 
                             <label>Theater:</label>
                             <select onChange={e => handleTheaterChange(e.target.value)}>
                                 <option onChange={e => { handleTheaterChange('') }}>Select Theater</option>
-                                <option value = {'Del Amo'}>Del Amo</option>
+                                <option value={'Del Amo'}>Del Amo</option>
                                 <option onChange={e => { handleTheaterChange('Rolling Hills') }}>Rolling Hills</option>
                                 <option onChange={e => { handleTheaterChange('South Bay Galleria') }}>South Bay Galleria</option>
                                 <option onChange={e => { handleTheaterChange('South Bay Pavilion') }}>South Bay Pavilion</option>
@@ -179,10 +179,10 @@ export default function DB() {
 
                         <div>
                             <button onClick={() => { queryInventory(); setInventoryState('Location') }}>New Report</button>
-                            <button onClick={() => { queryShowAll(); setInventoryState('Show All Inventory')  }}>Show All Inventory</button>
+                            <button onClick={() => { queryShowAll(); setInventoryState('Show All Inventory') }}>Show All Inventory</button>
                         </div>
                     </div>
-                } 
+                }
 
 
                 {queryState === 'Users' &&
@@ -293,7 +293,7 @@ export default function DB() {
 
                     </table>
                 }
-                {inventoryState=== 'Show All Inventory' &&
+                {inventoryState === 'Show All Inventory' &&
                     <table>
                         <tbody>
                             <tr>
