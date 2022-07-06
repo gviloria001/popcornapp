@@ -33,6 +33,16 @@ export default function DB() {
     const [locationList, setLocationList] = useState([]);
     const [locationName, setLocationName] = useState("");
 
+    const editProduct = (key) => {
+        const quantity = prompt('Change quantity to: ')
+        Axios.post("http://localhost:3001/updateProduct", {
+            locationID: key.locationID,
+            productID: key.productID,
+            quantity: quantity
+        }).then((res) => {
+            
+        })
+    }
 
     useEffect(()=>{
         Axios.get('http://localhost:3001/theaterList').then((res) => {
@@ -271,48 +281,66 @@ export default function DB() {
 
             <div className='site-content'>
                 {inventoryState === 'Location' &&
-                    <table>
-                        <tbody>
-                            <tr>
-                                <th>
-                                    Product Name
-                                </th>
-                                <th>
-                                    Location Name
-                                </th>
-                                <th>
-                                    Total Quantity
-                                </th>
-                                <th>
-                                    Theater
-                                </th>
-                            </tr>
-                            {inventoryListLocations.map((val) => {
-                                return (
-                                    <tr key={val.productName}>
-                                        <td>{val.productName} </td>
-                                        <td>{val.locationName}</td>
-                                        <td>{val.quantity}</td>
-                                        <td>{val.theaterName}</td>
-                                    </tr>
+                            
+                            <table>{locationList.map((keyLocation) => {
+                                if (keyLocation.locationName === locationName || locationName === 'All'){
+                                    return (
+                                        <tbody>
+                                        <tr key={keyLocation.locationName}>
+                                            <th colSpan="3">
+                                                {keyLocation.locationName}
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Quantity</th>
+                                            <th>Edit</th>
+                                        </tr>
+                                        {inventoryListLocations.map((key) => {
+                                            if (key.locationName === keyLocation.locationName){
+                                                return (
+                                                    <tr>    
+                                                        {key.locationName === keyLocation.locationName && 
+                                                            <td> 
+                                                                {key.productName}
+                                                            </td>
+                                                        }
+                                                        {key.locationName === keyLocation.locationName && 
+                                                            <td>    
+                                                                {key.quantity}                                                               
+                                                            </td>
+                                                        }
+                                                        <td><button onClick={() => editProduct(key)}>Edit</button></td>
+                                                    </tr>
+                                                )
+                                            }
+                                            return null
+                                        })}
+                                        <br></br>
+                                        <br></br>
+                                    </tbody>
                                 )
+                                }
+                                return null
                             })}
-                        </tbody>
+                        </table>
+                
 
-                    </table>
                 }
+
                 {inventoryState === 'Show All Inventory' &&
-                            <div>{theaterList.map((theaterName) => {
+                            <table>{theaterList.map((theaterName) => {
                                 return (
-                                    <table>
+                                    <tbody>
                                         <tr key={theaterName.theaterName}>
-                                            <th colspan="2">
+                                            <th colSpan="3">
                                                 {theaterName.theaterName}
                                             </th>
                                         </tr>
                                         <tr>
                                             <th>Product Name</th>
                                             <th>Total Quantity</th>
+                                            <th>Edit</th>
                                         </tr>
                                         {inventoryList.map((key) => {
                                             if (key.theaterName === theaterName.theaterName){
@@ -327,17 +355,17 @@ export default function DB() {
                                                                 {key.totalQuantity}
                                                             </td>
                                                         }
+                                                        <td><button>Edit</button></td>
                                                     </tr>
                                                 )
                                             }
                                             return null
                                         })}
                                         <br></br>
-                                        <br></br>
-                                    </table>
+                                    </tbody>
                                 );
                             })}
-                        </div>
+                        </table>
                 }
 
                 {inventoryState === 'Users' &&

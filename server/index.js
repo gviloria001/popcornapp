@@ -85,6 +85,27 @@ app.get('/:theaterName/locationList', (req, res) => {
 
 })
 
+app.post('/updateProduct', (req, res) => {
+    console.log(req.body)
+    const locationID = req.body.locationID;
+    const productID = req.body.productID;
+    const quantity = req.body.quantity;
+
+    query = "UPDATE productlocation " +
+    "SET quantity = ? " +
+    "WHERE productID = ? " +
+    "AND locationID = ?"
+
+    db.query(query, [quantity,productID,locationID], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.send(result);
+        }
+    });
+})
+
 app.get('/:productName/:locationName/:theaterName', (req, res) => {
     const theaterName = req.params.theaterName;
     const locationName = req.params.locationName;
@@ -92,7 +113,7 @@ app.get('/:productName/:locationName/:theaterName', (req, res) => {
 
     const bol = true;
     const query1 = 
-        "SELECT locationName, productName, quantity, theaterName " +
+        "SELECT locationName, productName, quantity, theaterName, locationID, productID " +
         "FROM location " +
         "JOIN theater " +
         "USING (theaterID) " +
