@@ -57,9 +57,7 @@ export default function DB() {
         })
     }
 
-    const handleLocationChange = (paramLocation) => {
-        setLocationName(paramLocation);
-    }
+
 
     const handleProductChange = (paramProductName) => {
         switch (paramProductName) {
